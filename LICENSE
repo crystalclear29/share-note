@@ -1,21 +1,82 @@
-MIT License
+[root@centos-dep-698ff8dcd-z2zll /]# curl tony-python-devops-system.apps.tap-dev-nat.harel-office.com
+[root@centos-dep-698ff8dcd-z2zll /]# curl -v tony-python-devops-system.apps.tap-dev-nat.harel-office.com
+* About to connect() to tony-python-devops-system.apps.tap-dev-nat.harel-office.com port 80 (#0)
+*   Trying 10.142.137.216...
+* Connected to tony-python-devops-system.apps.tap-dev-nat.harel-office.com (10.142.137.216) port 80 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: tony-python-devops-system.apps.tap-dev-nat.harel-office.com
+> Accept: */*
+>
+< HTTP/1.1 301 Moved Permanently
+< location: https://tony-python-devops-system.apps.tap-dev-nat.harel-office.com/
+< vary: Accept-Encoding
+< date: Thu, 09 Jan 2025 15:58:04 GMT
+< server: envoy
+< content-length: 0
+<
+* Connection #0 to host tony-python-devops-system.apps.tap-dev-nat.harel-office.com left intact
+[root@centos-dep-698ff8dcd-z2zll /]# curl -vvv tony-python-devops-system.apps.tap-dev-nat.harel-office.com
+* About to connect() to tony-python-devops-system.apps.tap-dev-nat.harel-office.com port 80 (#0)
+*   Trying 10.142.137.216...
+* Connected to tony-python-devops-system.apps.tap-dev-nat.harel-office.com (10.142.137.216) port 80 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: tony-python-devops-system.apps.tap-dev-nat.harel-office.com
+> Accept: */*
+>
+< HTTP/1.1 301 Moved Permanently
+< location: https://tony-python-devops-system.apps.tap-dev-nat.harel-office.com/
+< vary: Accept-Encoding
+< date: Thu, 09 Jan 2025 15:58:10 GMT
+< server: envoy
+< content-length: 0
+<
+* Connection #0 to host tony-python-devops-system.apps.tap-dev-nat.harel-office.com left intact
+[root@centos-dep-698ff8dcd-z2zll /]#
 
-Copyright (c) 2023 Alan Grainger
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+tony@PC80061058:~/.storage$ k get httpproxies.projectcontour.io tony-python-ingress -oyaml
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  annotations:
+    meta.helm.sh/release-name: tony-python
+    meta.helm.sh/release-namespace: devops-system
+  creationTimestamp: "2025-01-09T14:56:39Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    helm.toolkit.fluxcd.io/name: tony-python-helmrelease
+    helm.toolkit.fluxcd.io/namespace: flux-system
+  name: tony-python-ingress
+  namespace: devops-system
+  resourceVersion: "3349160377"
+  uid: 55f278ae-7bf7-45a2-af14-98317d9ca855
+spec:
+  routes:
+  - conditions:
+    - prefix: /
+    services:
+    - name: tony-python-svc
+      port: 8086
+    timeoutPolicy:
+      idle: 30s
+      response: 30s
+  virtualhost:
+    fqdn: tony-python-devops-system.apps.tap-dev-nat.harel-office.com
+    tls:
+      secretName: ingress-tls
+status:
+  conditions:
+  - lastTransitionTime: "2025-01-09T14:56:39Z"
+    message: Valid HTTPProxy
+    observedGeneration: 1
+    reason: Valid
+    status: "True"
+    type: Valid
+  currentStatus: valid
+  description: Valid HTTPProxy
+  loadBalancer:
+    ingress:
+    - ip: 10.142.137.216
