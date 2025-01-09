@@ -1,5 +1,4 @@
-[root@centos-dep-698ff8dcd-z2zll /]# curl tony-python-devops-system.apps.tap-dev-nat.harel-office.com
-[root@centos-dep-698ff8dcd-z2zll /]# curl -v tony-python-devops-system.apps.tap-dev-nat.harel-office.com
+[root@centos-dep-698ff8dcd-z2zll /]# curl -L -k -vvv tony-python-devops-system.apps.tap-dev-nat.harel-office.com
 * About to connect() to tony-python-devops-system.apps.tap-dev-nat.harel-office.com port 80 (#0)
 *   Trying 10.142.137.216...
 * Connected to tony-python-devops-system.apps.tap-dev-nat.harel-office.com (10.142.137.216) port 80 (#0)
@@ -11,72 +10,36 @@
 < HTTP/1.1 301 Moved Permanently
 < location: https://tony-python-devops-system.apps.tap-dev-nat.harel-office.com/
 < vary: Accept-Encoding
-< date: Thu, 09 Jan 2025 15:58:04 GMT
+< date: Thu, 09 Jan 2025 16:03:30 GMT
 < server: envoy
 < content-length: 0
 <
 * Connection #0 to host tony-python-devops-system.apps.tap-dev-nat.harel-office.com left intact
-[root@centos-dep-698ff8dcd-z2zll /]# curl -vvv tony-python-devops-system.apps.tap-dev-nat.harel-office.com
-* About to connect() to tony-python-devops-system.apps.tap-dev-nat.harel-office.com port 80 (#0)
+* Issue another request to this URL: 'https://tony-python-devops-system.apps.tap-dev-nat.harel-office.com/'
+* Found bundle for host tony-python-devops-system.apps.tap-dev-nat.harel-office.com: 0x2527020
+* About to connect() to tony-python-devops-system.apps.tap-dev-nat.harel-office.com port 443 (#1)
 *   Trying 10.142.137.216...
-* Connected to tony-python-devops-system.apps.tap-dev-nat.harel-office.com (10.142.137.216) port 80 (#0)
+* Connected to tony-python-devops-system.apps.tap-dev-nat.harel-office.com (10.142.137.216) port 443 (#1)
+* Initializing NSS with certpath: sql:/etc/pki/nssdb
+* skipping SSL peer certificate verification
+* SSL connection using TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+* Server certificate:
+*       subject: E=webmaster@harel-ins.co.il,CN=*.tap-dev-nat.harel-office.com,OU=Harel Group,O=Harel Group,L=Ramat-Gan,ST=Israel,C=IL
+*       start date: Jul 10 08:57:30 2022 GMT
+*       expire date: Jul 09 08:57:30 2027 GMT
+*       common name: *.tap-dev-nat.harel-office.com
+*       issuer: CN=Harel Insurance Issuing CA 01,DC=harel-ins,DC=com
 > GET / HTTP/1.1
 > User-Agent: curl/7.29.0
 > Host: tony-python-devops-system.apps.tap-dev-nat.harel-office.com
 > Accept: */*
 >
-< HTTP/1.1 301 Moved Permanently
-< location: https://tony-python-devops-system.apps.tap-dev-nat.harel-office.com/
+< HTTP/1.1 503 Service Unavailable
+< content-length: 152
+< content-type: text/plain
 < vary: Accept-Encoding
-< date: Thu, 09 Jan 2025 15:58:10 GMT
+< date: Thu, 09 Jan 2025 16:03:30 GMT
 < server: envoy
-< content-length: 0
 <
-* Connection #0 to host tony-python-devops-system.apps.tap-dev-nat.harel-office.com left intact
-[root@centos-dep-698ff8dcd-z2zll /]#
-
-
-tony@PC80061058:~/.storage$ k get httpproxies.projectcontour.io tony-python-ingress -oyaml
-apiVersion: projectcontour.io/v1
-kind: HTTPProxy
-metadata:
-  annotations:
-    meta.helm.sh/release-name: tony-python
-    meta.helm.sh/release-namespace: devops-system
-  creationTimestamp: "2025-01-09T14:56:39Z"
-  generation: 1
-  labels:
-    app.kubernetes.io/managed-by: Helm
-    helm.toolkit.fluxcd.io/name: tony-python-helmrelease
-    helm.toolkit.fluxcd.io/namespace: flux-system
-  name: tony-python-ingress
-  namespace: devops-system
-  resourceVersion: "3349160377"
-  uid: 55f278ae-7bf7-45a2-af14-98317d9ca855
-spec:
-  routes:
-  - conditions:
-    - prefix: /
-    services:
-    - name: tony-python-svc
-      port: 8086
-    timeoutPolicy:
-      idle: 30s
-      response: 30s
-  virtualhost:
-    fqdn: tony-python-devops-system.apps.tap-dev-nat.harel-office.com
-    tls:
-      secretName: ingress-tls
-status:
-  conditions:
-  - lastTransitionTime: "2025-01-09T14:56:39Z"
-    message: Valid HTTPProxy
-    observedGeneration: 1
-    reason: Valid
-    status: "True"
-    type: Valid
-  currentStatus: valid
-  description: Valid HTTPProxy
-  loadBalancer:
-    ingress:
-    - ip: 10.142.137.216
+* Connection #1 to host tony-python-devops-system.apps.tap-dev-nat.harel-office.com left intact
+upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: 111[root@centos-dep-698ff8dcd-z2zll /]#
