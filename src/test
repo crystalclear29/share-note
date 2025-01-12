@@ -1,0 +1,66 @@
+gbs() {
+    # Check dependencies
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "❌ fzf is not installed. Please install it first."
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        echo "❌ Not a git repository"
+        return 1
+    fi  # Fixed: Changed } to fi
+
+    # Get current branch for highlighting
+    current_branch=$(git branch --show-current)
+
+    # Get branches and format them
+    branches=$(git branch --all --format='%(refname:short)' | grep -v HEAD | sort -u)
+    if [ -z "$branches" ]; then
+        echo "❌ No branches found."
+        return 1
+    fi
+
+    # Add visual indicators and format branches
+    formatted_branches=$(echo "$branches" | while read -r branch; do
+        if [ "$branch" = "$current_branch" ]; then
+            echo "* $branch (current)"
+        elif [[ $branch == remotes/* ]]; then
+            echo "  $branch (remote)"
+        else
+            echo "  $branch"
+        fi
+    done)
+
+    # Use fzf with enhanced UI
+    selected=$(echo "$formatted_branches" | fzf \
+        --height 40% \
+        --reverse \
+        --prompt="🔄 Select branch > " \
+        --preview 'git log --color=always -n 50 --pretty=format:"%C(yellow)%h%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset" $(echo {} | sed "s/.* \(.*\) (.*/\1/")' \
+        --preview-window right:60%)
+
+    if [ -n "$selected" ]; then
+        # Extract branch name without indicators
+        selected=$(echo "$selected" | sed 's/^[* ] //' | sed 's/ (.*)//')
+
+        # Handle checkout
+        if [[ $selected == remotes/* ]]; then
+            branch_name=${selected##*/}
+            echo "🔄 Creating local branch '$branch_name' tracking '$selected'..."
+            if git checkout -b "$branch_name" --track "$selected" 2>/dev/null; then
+                echo "✅ Successfully switched to new branch '$branch_name'"
+            else
+                echo "❌ Failed to checkout branch"
+                return 1
+            fi
+        else
+            echo "🔄 Switching to '$selected'..."
+            if git checkout "$selected" 2>/dev/null; then
+                echo "✅ Successfully switched to '$selected'"
+            else
+                echo "❌ Failed to checkout branch"
+                return 1
+            fi
+        fi
+    fi
+}
