@@ -1,26 +1,88 @@
-# vscode
-.vscode 
+---
+created: 2025-02-05T18:32
+updated: 2025-02-05T20:03
+---
+### pseudo filesystem
+```bash
+# do nslookup 
+timeout 3 bash -c 'echo > /dev/tcp/electus/2049' 2>/dev/null && echo "Port open" || echo "Port closed"
 
-# Intellij
-*.iml
-.idea
+# If its not resolveable you will get
+bash: line 1: electus: No address associated with hostname
 
-# npm
-node_modules
 
-# Don't include the compiled main.js file in the repo.
-# They should be uploaded to GitHub releases instead.
-main.js
+# another way
+host=$(getent hosts electus 2>/dev/null) && echo "Host exists: $host" || echo "Host unreachable"
 
-# Exclude sourcemaps
-*.map
+# another way
+ping -c1 electus
 
-# obsidian
-data.json
 
-# Exclude macOS Finder (System Explorer) View States
-.DS_Store
+# test connection on port
+</dev/tcp/electus/2049 
+```
 
-test
-docs/.sass-cache/
-docs/_site/
+
+
+- why the arrow is differnt < vs >
+- what type of file is it and is it bascially s sytem call? whats the flow of exucting here, does it even create a new process, when does it load to memory etc.
+- extensive list of commands like thest
+
+
+
+- psedudo filesytstem also called virtual filesystem is ___
+```bash
+# One-liner to list processes
+for pid in /proc/[0-9]*; do
+    # Read process name and state
+    name=$(tr -d '\0' < "$pid/cmdline" 2>/dev/null || cat "$pid/comm" 2>/dev/null)
+    if [ ! -z "$name" ]; then
+        # Get process owner
+        owner=$(stat -c %U "$pid")
+        # Get memory usage from status
+        mem=$(awk '/VmRSS/{print $2}' "$pid/status" 2>/dev/null || echo 0)
+        echo "$owner $(basename $pid) $mem $name"
+    fi
+done
+
+# Alternative simpler version
+ls -l /proc/[0-9]*/exe 2>/dev/null | awk '{print $3, $9}'
+```
+
+
+
+
+# Linux alternatives
+- Creates symbolic links to default commands
+```bash
+# View all alternatives
+sudo update-alternatives --get-selections
+
+# Set an alternative
+sudo update-alternatives --install /usr/bin/editor editor /usr/bin/vim 100
+
+# Configure an alternative interactively
+sudo update-alternatives --config editor
+
+
+# Managing java versions (behind the scenes it just changes sym links)
+sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-11/bin/java 1100
+sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-8/bin/java 1000
+
+
+# How it works
+$ ls -la /usr/bin/java
+lrwxrwxrwx 1 root root 22 Sep 28  2022 /usr/bin/java -> /etc/alternatives/java
+```
+
+
+### file redrieciton
+```bash
+. <(ssh-agent.exe -s)
+
+
+. <(ssh-add ~/.ssh/id_ecdsa_ansible-pull)
+```
+
+
+Make note on kinit how ot install and setup, use commands etc
