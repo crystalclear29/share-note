@@ -1,26 +1,70 @@
-{
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "env": { "node": true },
-    "plugins": [
-      "@typescript-eslint"
-    ],
-    "extends": [
-      "standard",
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended"
-    ], 
-    "parserOptions": {
-        "sourceType": "module"
-    },
-    "rules": {
-      "no-new": 0,
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-var-requires": "off",
-      "@typescript-eslint/no-unused-vars": ["error", { "args": "none" }],
-      "@typescript-eslint/ban-ts-comment": "off",
-      "no-prototype-builtins": "off",
-      "@typescript-eslint/no-empty-function": "off"
-    } 
-  }
+Tanzu Buildpack for CA Certificates 3.7.2
+  https://github.com/pivotal-cf/tanzu-ca-certificates
+  Launch Helper: Contributing to layer
+    Creating /layers/tanzu-buildpacks_ca-certificates/helper/exec.d/ca-certificates-helper
+  CA Certificates: Contributing to layer
+    Added 4 additional CA certificate(s) to system truststore
+    Writing env.build/SSL_CERT_DIR.append
+    Writing env.build/SSL_CERT_DIR.delim
+    Writing env.build/SSL_CERT_FILE.default
+Tanzu Node Engine Buildpack 2.2.10
+  Resolving Node Engine version
+    Candidate version sources (in priority order):
+                -> ""
+      <unknown> -> ""
+
+    Selected Node Engine version (using ): 20.12.2
+
+  Executing build process
+    Installing Node Engine 20.12.2
+      Completed in 5.346s
+
+  Generating SBOM for /layers/tanzu-buildpacks_node-engine/node
+      Completed in 0s
+
+  Configuring build environment
+    NODE_ENV     -> "production"
+    NODE_HOME    -> "/layers/tanzu-buildpacks_node-engine/node"
+    NODE_OPTIONS -> "--use-openssl-ca"
+    NODE_VERBOSE -> "false"
+
+  Configuring launch environment
+    NODE_ENV     -> "production"
+    NODE_HOME    -> "/layers/tanzu-buildpacks_node-engine/node"
+    NODE_OPTIONS -> "--use-openssl-ca"
+    NODE_VERBOSE -> "false"
+
+    Writing exec.d/0-optimize-memory
+      Calculates available memory based on container limits at launch time.
+      Made available in the MEMORY_AVAILABLE environment variable.
+
+Tanzu NPM Install Buildpack 1.3.6
+  Loading service binding of type 'npmrc'
+  Resolving installation process
+    Process inputs:
+      node_modules      -> "Not found"
+      npm-cache         -> "Not found"
+      package-lock.json -> "Not found"
+
+    Selected NPM build process: 'npm install'
+
+  Executing build environment install process
+    Running 'npm install --unsafe-perm --cache /layers/tanzu-buildpacks_npm-install/npm-cache'
+      npm notice 
+      npm notice New major version of npm available! 10.5.0 -> 11.1.0
+      npm notice Changelog: <https://github.com/npm/cli/releases/tag/v11.1.0>
+      npm notice Run `npm install -g npm@11.1.0` to update!
+      npm notice 
+      npm ERR! code ECONNRESET
+      npm ERR! syscall read
+      npm ERR! errno -104
+      npm ERR! network read ECONNRESET
+      npm ERR! network This is a problem related to network connectivity.
+      npm ERR! network In most cases you are behind a proxy or have bad network settings.
+      npm ERR! network 
+      npm ERR! network If you are behind a proxy, please make sure that the
+      npm ERR! network 'proxy' config is set properly.  See: 'npm help config'
+      
+      npm ERR! A complete log of this run can be found in: /layers/tanzu-buildpacks_npm-install/npm-cache/_logs/2025-02-17T16_15_43_158Z-debug-0.log
+npm install failed: exit status 152
+ERROR: failed to build: exit status 1
