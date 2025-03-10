@@ -1,32 +1,81 @@
-{
-	"name": "share-note",
-	"version": "0.8.17",
-	"description": "Instantly share a note, with the full theme and content exactly like you see in Reading View. Data is shared encrypted by default, and only you and the person you send it to have the key.",
-	"main": "main.js",
-	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
-	},
-	"keywords": [],
-	"author": "Alan Grainger",
-	"license": "MIT",
-	"devDependencies": {
-		"@types/csso": "^5.0.2",
-		"@types/node": "^16.11.6",
-		"@typescript-eslint/eslint-plugin": "5.29.0",
-		"@typescript-eslint/parser": "5.29.0",
-		"builtin-modules": "3.3.0",
-		"esbuild": "0.17.3",
-		"eslint": "^8.49.0",
-		"eslint-config-standard": "^17.1.0",
-		"obsidian": "latest",
-		"tslib": "2.4.0",
-		"typescript": "4.7.4",
-		"browser-image-compression": "^2.0.2"
-	},
-	"dependencies": {
-		"csso": "^5.0.5",
-		"data-uri-to-buffer": "^6.0.1"
-	}
-}
+LOCAL_PATH = os.getenv("LOCAL_PATH", default='.')
+NAMESPACE = os.getenv("NAMESPACE", default='integration-ms-ns')
+
+k8s_custom_deploy(
+    'python-it',
+    apply_cmd="kubectl delete -f ./pipelinerun.yaml | true && kubectl apply -f ./pipelinerun.yaml -oyaml",
+    delete_cmd="kubectl delete -f ./pipelinerun.yaml",
+    deps=['requirements.txt', './src'],
+    container_selector='workload-knative-tilt',
+    live_update=[
+        sync('./src', '/workspace/source/src'),  
+        sync('./requirements.txt', '/workspace/source/requirements.txt'), 
+    ]
+)
+
+k8s_kind(
+    'Service',
+    api_version='serving.knative.dev/v1',
+    image_json_path='.spec.template.spec.containers[0].image',
+    pod_readiness='wait',
+
+)
+
+
+
+k8s_resource(
+    'python-it',
+    port_forwards=["8080:8080"],
+    extra_pod_selectors=[{'serving.knative.dev/service': 'investments-python-anton'}],
+)
+allow_k8s_contexts('k8s-dev-nat-iterate-cluster')
+ 
+
+
+# final output
+[step-create] Adding label 'io.buildpacks.lifecycle.metadata'
+[step-create] Adding label 'io.buildpacks.build.metadata'
+[step-create] Adding label 'io.buildpacks.project.metadata'
+[step-create] Setting default process type 'web'
+[step-create] Saving hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-181847...
+[step-create] *** Images (sha256:1afd6c7541402ed8ff3752d288f5f55d1398891274d9842ee984de56c5c6ea53):
+[step-create]       hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-181847
+[step-results] sha256:1afd6c7541402ed8ff3752d288f5f55d1398891274d9842ee984de56c5c6ea53hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-181847
+[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/tap-vmware/1.8/tap-packages@sha256:270bd02c777ef2ab3652f59eb31544634e994b9415bf1e34e53c09c281f6077c" already present on machine
+[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/tap-vmware/1.8/tap-packages@sha256:cd44dfd35a1e2f055ee51c713f0d141cce550108ccbf99e956824907d7f1be79" already present on machine
+[prepare] 2025/03/10 18:19:40 Entrypoint initialization
+[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/dockerhub/linuxserver/yq:v1.0" already present on machine
+[place-scripts] 2025/03/10 18:19:40 Decoded script /tekton/scripts/script-0-prknd
+[place-scripts] 2025/03/10 18:19:40 Decoded script /tekton/scripts/script-1-qpqw9
+[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/devops/kubectl-sops:v1.1" already present on machine
+[step-kubectl-apply] 2025/03/10 18:19:41 warning: unsuccessful cred copy: ".docker" from "/tekton/creds" to "/": unable to create destination directory: mkdir /.docker: permission denied
+[step-generate-knative] apiVersion: serving.knative.dev/v1
+[step-generate-knative] kind: Service
+[step-generate-knative] metadata:
+[step-generate-knative]   name: investments-python-anton
+[step-generate-knative]   namespace: integration-ms-ns
+[step-generate-knative] spec:
+[step-generate-knative]   template:
+[step-generate-knative]     metadata:
+[step-generate-knative]     spec:
+[step-generate-knative]       containers:
+[step-generate-knative]         - image: hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-181847
+[step-generate-knative]           name: workload-knative-tilt
+[step-generate-knative]           resources: {}
+[step-generate-knative]           securityContext:
+[step-generate-knative]             allowPrivilegeEscalation: false
+[step-generate-knative]             capabilities:
+[step-generate-knative]               drop:
+[step-generate-knative]                 - ALL
+[step-generate-knative]             runAsNonRoot: true
+[step-generate-knative]             runAsUser: 1000
+[step-generate-knative]             seccompProfile:
+[step-generate-knative]               type: RuntimeDefault
+[step-generate-knative]       serviceAccountName: default
+[step-kubectl-apply] service.serving.knative.dev/investments-python-anton configured
+Reconnecting... Error port-forwarding python-it (8080 -> 8080): error upgrading connection: unable to upgrade connection: pod not found ("investments-python-test-generate-apply-knative-pod_tekton-pipelineruns")
+█
+
+
+
+
