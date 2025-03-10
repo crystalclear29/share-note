@@ -1,81 +1,456 @@
-LOCAL_PATH = os.getenv("LOCAL_PATH", default='.')
-NAMESPACE = os.getenv("NAMESPACE", default='integration-ms-ns')
-
-k8s_custom_deploy(
-    'python-it',
-    apply_cmd="kubectl delete -f ./pipelinerun.yaml | true && kubectl apply -f ./pipelinerun.yaml -oyaml",
-    delete_cmd="kubectl delete -f ./pipelinerun.yaml",
-    deps=['requirements.txt', './src'],
-    container_selector='workload-knative-tilt',
-    live_update=[
-        sync('./src', '/workspace/source/src'),  
-        sync('./requirements.txt', '/workspace/source/requirements.txt'), 
-    ]
-)
-
-k8s_kind(
-    'Service',
-    api_version='serving.knative.dev/v1',
-    image_json_path='.spec.template.spec.containers[0].image',
-    pod_readiness='wait',
-
-)
-
-
-
-k8s_resource(
-    'python-it',
-    port_forwards=["8080:8080"],
-    extra_pod_selectors=[{'serving.knative.dev/service': 'investments-python-anton'}],
-)
-allow_k8s_contexts('k8s-dev-nat-iterate-cluster')
- 
-
-
-# final output
-[step-create] Adding label 'io.buildpacks.lifecycle.metadata'
-[step-create] Adding label 'io.buildpacks.build.metadata'
-[step-create] Adding label 'io.buildpacks.project.metadata'
-[step-create] Setting default process type 'web'
-[step-create] Saving hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-181847...
-[step-create] *** Images (sha256:1afd6c7541402ed8ff3752d288f5f55d1398891274d9842ee984de56c5c6ea53):
-[step-create]       hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-181847
-[step-results] sha256:1afd6c7541402ed8ff3752d288f5f55d1398891274d9842ee984de56c5c6ea53hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-181847
-[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/tap-vmware/1.8/tap-packages@sha256:270bd02c777ef2ab3652f59eb31544634e994b9415bf1e34e53c09c281f6077c" already present on machine
-[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/tap-vmware/1.8/tap-packages@sha256:cd44dfd35a1e2f055ee51c713f0d141cce550108ccbf99e956824907d7f1be79" already present on machine
-[prepare] 2025/03/10 18:19:40 Entrypoint initialization
-[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/dockerhub/linuxserver/yq:v1.0" already present on machine
-[place-scripts] 2025/03/10 18:19:40 Decoded script /tekton/scripts/script-0-prknd
-[place-scripts] 2025/03/10 18:19:40 Decoded script /tekton/scripts/script-1-qpqw9
-[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/devops/kubectl-sops:v1.1" already present on machine
-[step-kubectl-apply] 2025/03/10 18:19:41 warning: unsuccessful cred copy: ".docker" from "/tekton/creds" to "/": unable to create destination directory: mkdir /.docker: permission denied
-[step-generate-knative] apiVersion: serving.knative.dev/v1
-[step-generate-knative] kind: Service
-[step-generate-knative] metadata:
-[step-generate-knative]   name: investments-python-anton
-[step-generate-knative]   namespace: integration-ms-ns
-[step-generate-knative] spec:
-[step-generate-knative]   template:
-[step-generate-knative]     metadata:
-[step-generate-knative]     spec:
-[step-generate-knative]       containers:
-[step-generate-knative]         - image: hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-181847
-[step-generate-knative]           name: workload-knative-tilt
-[step-generate-knative]           resources: {}
-[step-generate-knative]           securityContext:
-[step-generate-knative]             allowPrivilegeEscalation: false
-[step-generate-knative]             capabilities:
-[step-generate-knative]               drop:
-[step-generate-knative]                 - ALL
-[step-generate-knative]             runAsNonRoot: true
-[step-generate-knative]             runAsUser: 1000
-[step-generate-knative]             seccompProfile:
-[step-generate-knative]               type: RuntimeDefault
-[step-generate-knative]       serviceAccountName: default
-[step-kubectl-apply] service.serving.knative.dev/investments-python-anton configured
-Reconnecting... Error port-forwarding python-it (8080 -> 8080): error upgrading connection: unable to upgrade connection: pod not found ("investments-python-test-generate-apply-knative-pod_tekton-pipelineruns")
-█
-
-
-
-
+Name:         python-it
+Namespace:    
+Labels:       <none>
+Annotations:  tilt.dev/log-span-id: kubernetesapply:python-it
+              tilt.dev/resource: python-it
+API Version:  tilt.dev/v1alpha1
+Kind:         KubernetesDiscovery
+Metadata:
+  Creation Timestamp:  2025-03-10T17:03:21Z
+  Owner References:
+    API Version:           tilt.dev/v1alpha1
+    Block Owner Deletion:  true
+    Controller:            true
+    Kind:                  KubernetesApply
+    Name:                  python-it
+    UID:                   bdaa54f4-a143-4953-9494-29040417c3c8
+  Resource Version:        2616
+  UID:                     62156d8f-4473-4577-8841-6312690a07f7
+Spec:
+  Cluster:  default
+  Extra Selectors:
+    Match Labels:
+      serving.knative.dev/service:  investments-python-anton
+  Pod Log Stream Template Spec:
+    Ignore Containers:
+      istio-init
+      istio-proxy
+      linkerd-proxy
+      linkerd-init
+    Since Time:  2025-03-10T17:03:20Z
+  Port Forward Template Spec:
+    Forwards:
+      Container Port:  8080
+      Host:            localhost
+      Local Port:      8080
+  Watches:
+    Name:       investments-python-test
+    Namespace:  tekton-pipelineruns
+    UID:        a57ebc7e-20dc-4d3b-bdec-13b4413bf28d
+Status:
+  Monitor Start Time:  2025-03-10T18:18:25.870918Z
+  Pods:
+    Ancestor UID:  a57ebc7e-20dc-4d3b-bdec-13b4413bf28d
+    Conditions:
+      Last Transition Time:  2025-03-10T18:18:37Z
+      Reason:                PodCompleted
+      Status:                True
+      Type:                  Initialized
+      Last Transition Time:  2025-03-10T18:18:40Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  Ready
+      Last Transition Time:  2025-03-10T18:18:40Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  ContainersReady
+      Last Transition Time:  2025-03-10T18:18:30Z
+      Status:                True
+      Type:                  PodScheduled
+    Containers:
+      Id:     043c214a25bddc8f9450b86260a3d8d7d6f25f9eea0a9800a280a92648111193
+      Image:  hrlharbor-dev.harel-office.com/devops/tekton-images/git-init:v0.40.2
+      Name:   step-clone-source-code
+      Ports:
+      Ready:     false
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:40Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:37Z
+        Waiting:        <nil>
+    Created At:         2025-03-10T18:18:27Z
+    Deleting:           false
+    Errors:
+    Init Containers:
+      Id:     527682ebaa0c8ee625a9cf52b1a9494bdc8b194a46d2e077dae5e9566eca7b9c
+      Image:  sha256:e8c02f0cca7353e70b065ceddce531baf8a80ba24bbaaf89ce899c1972f74ce4
+      Name:   prepare
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:36Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:36Z
+        Waiting:        <nil>
+      Id:               f53098a22c0a20e9e19b4e0ee4048c6d7c28021516d636514a8bd43af198f60c
+      Image:            sha256:691cdf869d543c4eeccfbdbe18d7ba4e217bca4d544509dae24353bf172dacf8
+      Name:             place-scripts
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:36Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:36Z
+        Waiting:        <nil>
+    Name:               investments-python-test-git-clone-pod
+    Namespace:          tekton-pipelineruns
+    Owner:
+      API Version:         tekton.dev/v1
+      Creation Timestamp:  2025-03-10T18:18:27Z
+      Kind:                TaskRun
+      Name:                investments-python-test-git-clone
+    Phase:                 Succeeded
+    Status:                Completed
+    UID:                   cd3a963b-5c74-4371-9136-876d24d7be35
+    Ancestor UID:          a57ebc7e-20dc-4d3b-bdec-13b4413bf28d
+    Conditions:
+      Last Transition Time:  2025-03-10T18:18:44Z
+      Reason:                PodCompleted
+      Status:                True
+      Type:                  Initialized
+      Last Transition Time:  2025-03-10T18:18:47Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  Ready
+      Last Transition Time:  2025-03-10T18:18:47Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  ContainersReady
+      Last Transition Time:  2025-03-10T18:18:41Z
+      Status:                True
+      Type:                  PodScheduled
+    Containers:
+      Id:     18a90b1e6314b249d4392a498ca9a02898118e8a3b53b4819aa98ebfb1b678de
+      Image:  hrlharbor-dev.harel-office.com/devops/tekton-images/bash:5.1.4
+      Name:   step-create-config-file
+      Ports:
+      Ready:     false
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:47Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:45Z
+        Waiting:        <nil>
+    Created At:         2025-03-10T18:18:41Z
+    Deleting:           false
+    Errors:
+    Init Containers:
+      Id:     f0cc798258e7f51a4c879156a78e112c7a16a08d25663679f3123e9f4fe14513
+      Image:  sha256:e8c02f0cca7353e70b065ceddce531baf8a80ba24bbaaf89ce899c1972f74ce4
+      Name:   prepare
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:43Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:43Z
+        Waiting:        <nil>
+      Id:               e8310bad6cc17551381b38eb42a172667bb3c1ceca412d01749659d4d0972fa6
+      Image:            sha256:691cdf869d543c4eeccfbdbe18d7ba4e217bca4d544509dae24353bf172dacf8
+      Name:             place-scripts
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:44Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:44Z
+        Waiting:        <nil>
+    Name:               investments-python-test-create-config-file-pod
+    Namespace:          tekton-pipelineruns
+    Owner:
+      API Version:         tekton.dev/v1
+      Creation Timestamp:  2025-03-10T18:18:40Z
+      Kind:                TaskRun
+      Name:                investments-python-test-create-config-file
+    Phase:                 Succeeded
+    Status:                Completed
+    UID:                   691399ec-a13e-4954-85da-212607ec29ac
+    Ancestor UID:          a57ebc7e-20dc-4d3b-bdec-13b4413bf28d
+    Conditions:
+      Last Transition Time:  2025-03-10T18:18:44Z
+      Reason:                PodCompleted
+      Status:                True
+      Type:                  Initialized
+      Last Transition Time:  2025-03-10T18:18:47Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  Ready
+      Last Transition Time:  2025-03-10T18:18:47Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  ContainersReady
+      Last Transition Time:  2025-03-10T18:18:41Z
+      Status:                True
+      Type:                  PodScheduled
+    Containers:
+      Id:     34ee7a25d3010aad9f9bb03edd2c9e90cdfaa8777aa594cab25e5de35205895e
+      Image:  hrlharbor-dev.harel-office.com/devops/tekton-images/bash:5.1.4
+      Name:   step-generate-timestamp
+      Ports:
+      Ready:     false
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:47Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:45Z
+        Waiting:        <nil>
+    Created At:         2025-03-10T18:18:41Z
+    Deleting:           false
+    Errors:
+    Init Containers:
+      Id:     924b04f6ff8b8c6b10064aa8d5137ecf1c127ac0fca658dae94998a073b5e0bd
+      Image:  sha256:e8c02f0cca7353e70b065ceddce531baf8a80ba24bbaaf89ce899c1972f74ce4
+      Name:   prepare
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:43Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:43Z
+        Waiting:        <nil>
+      Id:               b77f122211e34f9d5c1c9be186560140c3f8626164d84e058fde9455d9fdb25d
+      Image:            sha256:691cdf869d543c4eeccfbdbe18d7ba4e217bca4d544509dae24353bf172dacf8
+      Name:             place-scripts
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:44Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:44Z
+        Waiting:        <nil>
+    Name:               investments-python-test-create-timestamp-pod
+    Namespace:          tekton-pipelineruns
+    Owner:
+      API Version:         tekton.dev/v1
+      Creation Timestamp:  2025-03-10T18:18:40Z
+      Kind:                TaskRun
+      Name:                investments-python-test-create-timestamp
+    Phase:                 Succeeded
+    Status:                Completed
+    UID:                   5b8bed96-3fa6-4d38-8470-e9dd0bc49428
+    Ancestor UID:          a57ebc7e-20dc-4d3b-bdec-13b4413bf28d
+    Conditions:
+      Last Transition Time:  2025-03-10T18:18:52Z
+      Reason:                PodCompleted
+      Status:                True
+      Type:                  Initialized
+      Last Transition Time:  2025-03-10T18:18:55Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  Ready
+      Last Transition Time:  2025-03-10T18:18:55Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  ContainersReady
+      Last Transition Time:  2025-03-10T18:18:48Z
+      Status:                True
+      Type:                  PodScheduled
+    Containers:
+      Id:     c8d450e0c31662c97577f6dbd757f2375e2c8478fea635e0bfd0aa58124540d4
+      Image:  hrlharbor-dev.harel-office.com/tap-vmware/build-service:default-builder@sha256:15158647f213b085085adab861f855b8116ec92f7bd48bfff6b3c3a20f7cd7cf
+      Name:   step-create
+      Ports:
+      Ready:     false
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:19:36Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:52Z
+        Waiting:        <nil>
+      Id:               66f34cb1fffd6c7cf42d1e9148f474060bbf84a7f75a0589e511aba661b14f42
+      Image:            hrlharbor-dev.harel-office.com/devops/tekton-images/bash:5.1.4
+      Name:             step-prepare
+      Ports:
+      Ready:     false
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:54Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:52Z
+        Waiting:        <nil>
+      Id:               290acaebf84cb6fe5ed8c7219bdfaba8950b8720de0bb1046fb2361150bd071d
+      Image:            hrlharbor-dev.harel-office.com/devops/tekton-images/bash:5.1.4
+      Name:             step-results
+      Ports:
+      Ready:     false
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:19:37Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:52Z
+        Waiting:        <nil>
+    Created At:         2025-03-10T18:18:48Z
+    Deleting:           false
+    Errors:
+    Init Containers:
+      Id:     b4d1789b190530e80577ddbe91b0e12512ed3704e8ece8f71e08624cd09262c9
+      Image:  sha256:e8c02f0cca7353e70b065ceddce531baf8a80ba24bbaaf89ce899c1972f74ce4
+      Name:   prepare
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:50Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:50Z
+        Waiting:        <nil>
+      Id:               c5b090752ea6308c658a2a4a333949c8b79cad896e892938f32dd17dcae9b881
+      Image:            sha256:691cdf869d543c4eeccfbdbe18d7ba4e217bca4d544509dae24353bf172dacf8
+      Name:             place-scripts
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:18:51Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:18:51Z
+        Waiting:        <nil>
+    Name:               investments-python-test-buildpacks-pod
+    Namespace:          tekton-pipelineruns
+    Owner:
+      API Version:         tekton.dev/v1
+      Creation Timestamp:  2025-03-10T18:18:48Z
+      Kind:                TaskRun
+      Name:                investments-python-test-buildpacks
+    Phase:                 Succeeded
+    Status:                Completed
+    UID:                   c293209d-640f-4748-ab53-caadfde3f04b
+    Ancestor UID:          a57ebc7e-20dc-4d3b-bdec-13b4413bf28d
+    Conditions:
+      Last Transition Time:  2025-03-10T18:19:41Z
+      Reason:                PodCompleted
+      Status:                True
+      Type:                  Initialized
+      Last Transition Time:  2025-03-10T18:19:43Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  Ready
+      Last Transition Time:  2025-03-10T18:19:43Z
+      Reason:                PodCompleted
+      Status:                False
+      Type:                  ContainersReady
+      Last Transition Time:  2025-03-10T18:19:38Z
+      Status:                True
+      Type:                  PodScheduled
+    Containers:
+      Id:     a245bcdcf30d01ad67c11b538c884873aba85f5ec2db3e9b124476f70d46c91a
+      Image:  hrlharbor-dev.harel-office.com/dockerhub/linuxserver/yq:v1.0
+      Name:   step-generate-knative
+      Ports:
+      Ready:     false
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:19:42Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:19:41Z
+        Waiting:        <nil>
+      Id:               1149e11a9df1367bfaebe20ebea46f8fa737733a5aac17ca7c289b3eab78f530
+      Image:            hrlharbor-dev.harel-office.com/devops/kubectl-sops:v1.1
+      Name:             step-kubectl-apply
+      Ports:
+      Ready:     false
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:19:43Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:19:41Z
+        Waiting:        <nil>
+    Created At:         2025-03-10T18:19:38Z
+    Deleting:           false
+    Errors:
+    Init Containers:
+      Id:     117786e86d1adaf34cae0b2b4108f8ba1f404ba52ffd95e75b3b0acf3ba62268
+      Image:  sha256:e8c02f0cca7353e70b065ceddce531baf8a80ba24bbaaf89ce899c1972f74ce4
+      Name:   prepare
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:19:40Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:19:40Z
+        Waiting:        <nil>
+      Id:               01850d9b34cef1532953ee5fb76ecd073e3ea3cd47e9ac87a923932750abb411
+      Image:            sha256:691cdf869d543c4eeccfbdbe18d7ba4e217bca4d544509dae24353bf172dacf8
+      Name:             place-scripts
+      Ports:
+      Ready:     true
+      Restarts:  0
+      State:
+        Running:  <nil>
+        Terminated:
+          Exit Code:    0
+          Finished At:  2025-03-10T18:19:40Z
+          Reason:       Completed
+          Started At:   2025-03-10T18:19:40Z
+        Waiting:        <nil>
+    Name:               investments-python-test-generate-apply-knative-pod
+    Namespace:          tekton-pipelineruns
+    Owner:
+      API Version:         tekton.dev/v1
+      Creation Timestamp:  2025-03-10T18:19:38Z
+      Kind:                TaskRun
+      Name:                investments-python-test-generate-apply-knative
+    Phase:                 Succeeded
+    Status:                Completed
+    UID:                   2f79c950-c7dd-482a-a3d8-ed4a77b713a0
+  Running:
+    Start Time:  2025-03-10T18:18:25.870918Z
