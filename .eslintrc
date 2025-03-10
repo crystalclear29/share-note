@@ -1,70 +1,73 @@
-Tanzu Buildpack for CA Certificates 3.7.2
-  https://github.com/pivotal-cf/tanzu-ca-certificates
-  Launch Helper: Contributing to layer
-    Creating /layers/tanzu-buildpacks_ca-certificates/helper/exec.d/ca-certificates-helper
-  CA Certificates: Contributing to layer
-    Added 4 additional CA certificate(s) to system truststore
-    Writing env.build/SSL_CERT_DIR.append
-    Writing env.build/SSL_CERT_DIR.delim
-    Writing env.build/SSL_CERT_FILE.default
-Tanzu Node Engine Buildpack 2.2.10
-  Resolving Node Engine version
-    Candidate version sources (in priority order):
-                -> ""
-      <unknown> -> ""
+LOCAL_PATH = os.getenv("LOCAL_PATH", default='.')
+NAMESPACE = os.getenv("NAMESPACE", default='integration-ms-ns')
 
-    Selected Node Engine version (using ): 20.12.2
+# Apply command adjusted for Python app using kubectl or Tanzu (if you're using Tanzu)
+k8s_custom_deploy(
+    'python-it',
+    apply_cmd="kubectl delete -f ./pipelinerun.yaml | true && kubectl apply -f ./pipelinerun.yaml -oyaml",
+    delete_cmd="kubectl delete -f ./pipelinerun.yaml",
+    deps=['requirements.txt', './src'],  # Adjust for Python app's dependencies
+    container_selector='workload-knative-tilt',
+    live_update=[
+        # Sync the Python source code and requirements.txt
+        sync('./src', '/workspace/source/src'),  # Adjust the source folder for your Python app
+        sync('./requirements.txt', '/workspace/source/requirements.txt'),  # Sync requirements.txt
+    ]
+)
 
-  Executing build process
-    Installing Node Engine 20.12.2
-      Completed in 5.346s
+k8s_kind(
+    'Service',
+    api_version='serving.knative.dev/v1',
+    image_json_path='.spec.template.spec.containers[0].image',
+    pod_readiness='wait',
+)
+# # Expose the app via port forwarding on port 8080
+# k8s_resource('python-it', port_forwards=["8080:8080"],
+#     extra_pod_selectors=[{'app': 'investments-python-anton-00007'}],
+#     )
+            
+# k8s_resource('python-it', extra_pod_selectors={'app': 'investments-python-anton-00001'}, discovery_strategy='selectosrs-only')
 
-  Generating SBOM for /layers/tanzu-buildpacks_node-engine/node
-      Completed in 0s
 
-  Configuring build environment
-    NODE_ENV     -> "production"
-    NODE_HOME    -> "/layers/tanzu-buildpacks_node-engine/node"
-    NODE_OPTIONS -> "--use-openssl-ca"
-    NODE_VERBOSE -> "false"
+# Allow a specific Kubernetes context
+allow_k8s_contexts('k8s-dev-nat-iterate-cluster')
+ 
 
-  Configuring launch environment
-    NODE_ENV     -> "production"
-    NODE_HOME    -> "/layers/tanzu-buildpacks_node-engine/node"
-    NODE_OPTIONS -> "--use-openssl-ca"
-    NODE_VERBOSE -> "false"
 
-    Writing exec.d/0-optimize-memory
-      Calculates available memory based on container limits at launch time.
-      Made available in the MEMORY_AVAILABLE environment variable.
 
-Tanzu NPM Install Buildpack 1.3.6
-  Loading service binding of type 'npmrc'
-  Resolving installation process
-    Process inputs:
-      node_modules      -> "Not found"
-      npm-cache         -> "Not found"
-      package-lock.json -> "Not found"
 
-    Selected NPM build process: 'npm install'
-
-  Executing build environment install process
-    Running 'npm install --unsafe-perm --cache /layers/tanzu-buildpacks_npm-install/npm-cache'
-      npm notice 
-      npm notice New major version of npm available! 10.5.0 -> 11.1.0
-      npm notice Changelog: <https://github.com/npm/cli/releases/tag/v11.1.0>
-      npm notice Run `npm install -g npm@11.1.0` to update!
-      npm notice 
-      npm ERR! code ECONNRESET
-      npm ERR! syscall read
-      npm ERR! errno -104
-      npm ERR! network read ECONNRESET
-      npm ERR! network This is a problem related to network connectivity.
-      npm ERR! network In most cases you are behind a proxy or have bad network settings.
-      npm ERR! network 
-      npm ERR! network If you are behind a proxy, please make sure that the
-      npm ERR! network 'proxy' config is set properly.  See: 'npm help config'
-      
-      npm ERR! A complete log of this run can be found in: /layers/tanzu-buildpacks_npm-install/npm-cache/_logs/2025-02-17T16_15_43_158Z-debug-0.log
-npm install failed: exit status 152
-ERROR: failed to build: exit status 1
+ # final lines of output from the apply cmd
+ [step-results] sha256:685940c2768b8f3e42be0caf17e99cf65e7b513cdd99986d77e655128b4a33c8hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-180613
+[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/tap-vmware/1.8/tap-packages@sha256:270bd02c777ef2ab3652f59eb31544634e994b9415bf1e34e53c09c281f6077c" already present on machine
+[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/tap-vmware/1.8/tap-packages@sha256:cd44dfd35a1e2f055ee51c713f0d141cce550108ccbf99e956824907d7f1be79" already present on machine
+[prepare] 2025/03/10 18:07:05 Entrypoint initialization
+[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/dockerhub/linuxserver/yq:v1.0" already present on machine
+[place-scripts] 2025/03/10 18:07:06 Decoded script /tekton/scripts/script-0-sz865
+[place-scripts] 2025/03/10 18:07:06 Decoded script /tekton/scripts/script-1-m4z6j
+[event: pod tekton-pipelineruns/investments-python-test-generate-apply-knative-pod] Container image "hrlharbor-dev.harel-office.com/devops/kubectl-sops:v1.1" already present on machine
+[step-kubectl-apply] 2025/03/10 18:07:07 warning: unsuccessful cred copy: ".docker" from "/tekton/creds" to "/": unable to create destination directory: mkdir /.docker: permission denied
+[step-generate-knative] apiVersion: serving.knative.dev/v1
+[step-generate-knative] kind: Service
+[step-generate-knative] metadata:
+[step-generate-knative]   name: investments-python-anton
+[step-generate-knative]   namespace: integration-ms-ns
+[step-generate-knative] spec:
+[step-generate-knative]   template:
+[step-generate-knative]     metadata:
+[step-generate-knative]     spec:
+[step-generate-knative]       containers:
+[step-generate-knative]         - image: hrlharbor-dev.harel-office.com/investments/investments-python-anton:c85e6d7b8aa29be1b360934a73384b85eec59a89-20250310-180613
+[step-generate-knative]           name: workload-knative-tilt
+[step-generate-knative]           resources: {}
+[step-generate-knative]           securityContext:
+[step-generate-knative]             allowPrivilegeEscalation: false
+[step-generate-knative]             capabilities:
+[step-generate-knative]               drop:
+[step-generate-knative]                 - ALL
+[step-generate-knative]             runAsNonRoot: true
+[step-generate-knative]             runAsUser: 1000
+[step-generate-knative]             seccompProfile:
+[step-generate-knative]               type: RuntimeDefault
+[step-generate-knative]       serviceAccountName: default
+[step-kubectl-apply] service.serving.knative.dev/investments-python-anton configured
+█
